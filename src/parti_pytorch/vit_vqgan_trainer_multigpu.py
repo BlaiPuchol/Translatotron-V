@@ -8,7 +8,8 @@ from PIL import Image
 import time
 import torch
 from torch import nn
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp.autocast_mode import autocast
+from torch.amp.grad_scaler import GradScaler
 from torch.utils.data import Dataset, DataLoader, random_split
 
 import torchvision.transforms as T
@@ -140,8 +141,8 @@ class VQGanVAETrainerMGPU(nn.Module):
         self.discr_optim = get_optimizer(discr_parameters, lr = lr, wd = wd)
 
         self.amp = amp
-        self.scaler = GradScaler(enabled = amp)
-        self.discr_scaler = GradScaler(enabled = amp)
+        self.scaler = GradScaler('cuda', enabled = amp)
+        self.discr_scaler = GradScaler('cuda', enabled = amp)
 
         # create dataset
 
@@ -209,7 +210,7 @@ class VQGanVAETrainerMGPU(nn.Module):
             img = next(self.dl)
             img = img.to(device)
 
-            with autocast(enabled = self.amp):
+            with autocast('cuda', enabled = self.amp):
                 loss = self.vae(
                     img,
                     return_loss = True,
@@ -235,7 +236,7 @@ class VQGanVAETrainerMGPU(nn.Module):
                 img = next(self.dl)
                 img = img.to(device)
 
-                with autocast(enabled = self.amp):
+                with autocast('cuda', enabled = self.amp):
                     loss = self.vae(img, return_discr_loss = True)
 
                     # self.discr_scaler.scale(loss / self.grad_accum_every).backward()
