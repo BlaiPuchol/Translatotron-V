@@ -15,7 +15,7 @@ num_layers=4
 batch_size=4
 grad_accum_every=16
 save_name="tiny-de-en"
-image_dir="../dataset/IWSLT/iwslt14-images/train_de"
+image_dir="../datasets/IWSLT/iwslt14.de-en-images/train_de"
 
 python -m torch.distributed.run --nproc_per_node=2 $prefix/src/train_mgpu.py \
     --output_dir $prefix/image-tokenizer/$save_name \
