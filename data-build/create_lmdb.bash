@@ -1,13 +1,20 @@
+#!/bin/bash
+#SBATCH -p docencia             # cola
+#SBATCH --gres=gpu:1            # nº de GPUs (máximo 4)
+#SBATCH --cpus-per-task=16      # nº de CPUs (máximo 96)
+#SBATCH --time=12:00:00         # tiempo máximo (opcional)
+#SBATCH --job-name=test
+#SBATCH -o salida_%j.log        # log de salida
 
-export prefix="your scr code directory"
+export prefix="/home/alumno.upv.es/bpucsal/Translatotron-V"
 
 
-export save_name=data-build/iwslt17.ro-en-lmdb
+export save_name=data-build/iwslt14.de-en-lmdb
 
-/opt/conda/bin/python $prefix/data-build/create_lmdb_mulproc.py \
+python $prefix/data-build/create_lmdb_mulproc.py \
     --output_dir $prefix/$save_name \
-    --text_data_dir $prefix/data-build/iwslt17.ro-en \
-    --image_data_dir $prefix/data-build/iwslt17.ro-en-images \
-    --src_lang ro \
+    --text_data_dir $prefix/../datasets/IWSLT/iwslt14.de-en \
+    --image_data_dir $prefix/../datasets/IWSLT/iwslt14.de-en-images \
+    --src_lang de \
     --tgt_lang en \
-    --num_workers 64
+    --num_workers 16
