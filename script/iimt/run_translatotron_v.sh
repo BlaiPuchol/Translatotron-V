@@ -1,9 +1,16 @@
+#!/bin/bash
+#SBATCH -p docencia             # cola
+#SBATCH --gres=gpu:2            # nº de GPUs (máximo 4)
+#SBATCH --cpus-per-task=32      # nº de CPUs (máximo 96)
 
-export prefix="your scr code directory"
-export save_name="model save name"
+#SBATCH --job-name=train
+#SBATCH -o salida_%j.log        # log de salida
+
+export prefix="/home/alumno.upv.es/bpucsal/Translatotron-V"
+export save_name="tiny-de-en"
 
 
-python -m torch.distributed.launch --nproc_per_node=8 $prefix/src/run_translatotron_v.py \
+python -m torch.distributed.run --nproc_per_node=2 $prefix/src/run_translatotron_v.py \
     --train_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/train_ \
     --valid_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/valid_ \
     --per_device_train_batch_size 5 \

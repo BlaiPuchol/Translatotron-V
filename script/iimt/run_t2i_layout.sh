@@ -1,8 +1,15 @@
+#!/bin/bash
+#SBATCH -p docencia             # cola
+#SBATCH --gres=gpu:2            # nº de GPUs (máximo 4)
+#SBATCH --cpus-per-task=32      # nº de CPUs (máximo 96)
 
-export prefix="your scr code directory"
-export save_name="model save name"
+#SBATCH --job-name=train
+#SBATCH -o salida_%j.log        # log de salida
 
-/opt/conda/bin/python -m torch.distributed.launch --nproc_per_node=8 --master_port=27699 $prefix/src/run_t2i_with_layout.py \
+export prefix="/home/alumno.upv.es/bpucsal/Translatotron-V"
+export save_name="tiny-de-en-layout"
+
+python -m torch.distributed.run --nproc_per_node=2 $prefix/src/run_t2i_with_layout.py \
     --train_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/train_ \
     --valid_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/valid_ \
     --per_device_train_batch_size 10 \
@@ -20,9 +27,11 @@ export save_name="model save name"
     --tgt_tokenizer_path $prefix/src/config/char_en.tokenizer \
     --vae_config_path $prefix/src/config/vit_vqgan_8192cb.json \
     --t2i_config_path $prefix/src/config/t2i_transformer_distill.json \
-    --vae_weight $prefix/image-tokenizer/en/vae.pt \
-    --resume_from_checkpoint $prefix/result_new/$save_name/epoch_6 \
+    --vae_weight $prefix/image-tokenizer/en/vae.1000.pt \
     --use_amp true \
-    --num_workers 16 \
+    --num_workers 32 \
     --checkpointing_steps epoch \
     >>$prefix/log_latest/$save_name.log 2>&1
+
+
+#   --resume_from_checkpoint $prefix/result_new/$save_name/epoch_6 \
