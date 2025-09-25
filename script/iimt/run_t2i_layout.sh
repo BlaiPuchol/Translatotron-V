@@ -10,8 +10,8 @@ export prefix="/home/alumno.upv.es/bpucsal/Translatotron-V"
 export save_name="tiny-de-en-layout"
 
 python -m torch.distributed.run --nproc_per_node=2 $prefix/src/run_t2i_with_layout.py \
-    --train_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/train_ \
-    --valid_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/valid_ \
+    --train_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/train_de \
+    --valid_lmdb_path $prefix/data-build/iwslt14.de-en-lmdb/valid_de \
     --per_device_train_batch_size 10 \
     --per_device_eval_batch_size 10 \
     --learning_rate 1e-4 \
