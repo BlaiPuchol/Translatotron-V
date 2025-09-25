@@ -2,7 +2,7 @@
 #SBATCH -p docencia             # cola
 #SBATCH --gres=gpu:2            # nº de GPUs (máximo 4)
 #SBATCH --cpus-per-task=32      # nº de CPUs (máximo 96)
-#SBATCH --nodes=2               # número de nodos 
+
 #SBATCH --job-name=train
 #SBATCH -o salida_%j.log        # log de salida
 
