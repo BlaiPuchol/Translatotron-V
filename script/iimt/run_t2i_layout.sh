@@ -27,7 +27,7 @@ python -m torch.distributed.run --nproc_per_node=2 $prefix/src/run_t2i_with_layo
     --tgt_tokenizer_path $prefix/src/config/char_en.tokenizer \
     --vae_config_path $prefix/src/config/vit_vqgan_8192cb.json \
     --t2i_config_path $prefix/src/config/t2i_transformer_distill.json \
-    --vae_weight $prefix/image-tokenizer/en/vae.1000.pt \
+    --vae_weight $prefix/image-tokenizer/img-tokenizer-tiny-de-en/vae.1000.pt \
     --use_amp true \
     --num_workers 32 \
     --checkpointing_steps epoch \
