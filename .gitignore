@@ -1,2 +1,5 @@
 data-build/iwslt14.de-en-lmdb/
 image-tokenizer/
+outputs/
+result_new/
+log_latest/

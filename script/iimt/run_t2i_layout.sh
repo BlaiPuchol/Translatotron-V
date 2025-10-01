@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH -p docencia             # cola
+#SBATCH -p long             # cola
 #SBATCH --gres=gpu:2            # nº de GPUs (máximo 4)
-#SBATCH --cpus-per-task=32      # nº de CPUs (máximo 96)
+#SBATCH --cpus-per-task=2      # nº de CPUs (máximo 96)
 
 #SBATCH --job-name=train
 #SBATCH -o salida_%j.log        # log de salida
@@ -29,9 +29,7 @@ python -m torch.distributed.run --nproc_per_node=2 $prefix/src/run_t2i_with_layo
     --t2i_config_path $prefix/src/config/t2i_transformer_distill.json \
     --vae_weight $prefix/image-tokenizer/img-tokenizer-tiny-de-en/vae.1000.pt \
     --use_amp true \
-    --num_workers 32 \
+    --num_workers 2 \
     --checkpointing_steps epoch \
+    --resume_from_checkpoint $prefix/result_new/$save_name/epoch_77
     >>$prefix/log_latest/$save_name.log 2>&1
-
-
-#   --resume_from_checkpoint $prefix/result_new/$save_name/epoch_6 \
