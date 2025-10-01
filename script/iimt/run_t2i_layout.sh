@@ -31,5 +31,5 @@ python -m torch.distributed.run --nproc_per_node=2 $prefix/src/run_t2i_with_layo
     --use_amp true \
     --num_workers 2 \
     --checkpointing_steps epoch \
-    --resume_from_checkpoint $prefix/result_new/$save_name/epoch_77
+    --resume_from_checkpoint $prefix/result_new/$save_name/epoch_81 \
     >>$prefix/log_latest/$save_name.log 2>&1
