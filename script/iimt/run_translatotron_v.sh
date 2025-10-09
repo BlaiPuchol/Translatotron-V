@@ -29,7 +29,7 @@ python -m torch.distributed.run --nproc_per_node=2 $prefix/src/run_translatotron
     --tgt_tokenizer_path $prefix/src/config/char_en.tokenizer \
     --vae_config_path $prefix/src/config/vit_vqgan_8192cb.json \
     --iit_config_path $prefix/src/config/iit_transformer_512dim.json \
-    --teacher_model_weight $prefix/result_new/tiny-de-en-layout/epoch_81/optimizer.bin \
+    --teacher_model_weight $prefix/result_new/t2i_layout_avg/average_pytorch_model.bin \
     --teacher_config_path $prefix/src/config/t2i_transformer_distill.json \
     --temperature 1.0 \
     --vae_weight $prefix/image-tokenizer/img-tokenizer-tiny-de-en/vae.1000.pt \
