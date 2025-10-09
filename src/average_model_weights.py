@@ -6,6 +6,11 @@ import sys
 from typing import Dict, List, Tuple
 
 import torch
+try:
+    from safetensors.torch import load_file as load_safetensors
+    HAS_SAFETENSORS = True
+except Exception:
+    HAS_SAFETENSORS = False
 
 
 def find_checkpoints(root: str, model_file_name: str) -> List[dict]:
@@ -42,6 +47,16 @@ def select_last(checkpoints: List[dict], n_last: int, sort_by: str) -> List[dict
 
 
 def load_state_dict(path: str) -> Dict[str, torch.Tensor]:
+    # Handle Safetensors
+    if path.endswith(".safetensors"):
+        if not HAS_SAFETENSORS:
+            raise RuntimeError("safetensors not installed. pip install safetensors")
+        sd = load_safetensors(path, device="cpu")
+        if not isinstance(sd, dict) or not all(isinstance(v, torch.Tensor) for v in sd.values()):
+            raise ValueError(f"Unsupported safetensors format: {path}")
+        return sd
+
+    # Handle legacy/bin checkpoints
     obj = torch.load(path, map_location="cpu")
     if isinstance(obj, dict) and obj and all(isinstance(v, torch.Tensor) for v in obj.values()):
         return obj
@@ -116,7 +131,7 @@ def main():
     parser.add_argument(
         "--model_file_name",
         type=str,
-        default="pytorch_model.bin",
+        default="model.safetensors", 
         help="Model weight filename inside each checkpoint folder.",
     )
     parser.add_argument(
