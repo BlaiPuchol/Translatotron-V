@@ -10,6 +10,13 @@ from typing import Optional, Any, Union, Callable
 from torch.functional import F
 import copy
 
+def generate_square_subsequent_mask(sz: int) -> torch.Tensor:
+    """
+    Generate a square mask for the sequence. The masked positions are filled with float('-inf').
+    Unmasked positions are filled with float(0.0).
+    """
+    return torch.triu(torch.full((sz, sz), float('-inf')), diagonal=1)
+
 class TransformerDecoderLayer(Module):
     r"""TransformerDecoderLayer is made up of self-attn, multi-head-attn and feedforward network.
     This standard decoder layer is based on the paper "Attention Is All You Need".
@@ -82,7 +89,8 @@ class TransformerDecoderLayer(Module):
         super(TransformerDecoderLayer, self).__setstate__(state)
 
     def forward(self, tgt: Tensor, memory: Tensor, tgt_mask: Optional[Tensor] = None, memory_mask: Optional[Tensor] = None,
-                tgt_key_padding_mask: Optional[Tensor] = None, memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+                tgt_key_padding_mask: Optional[Tensor] = None, memory_key_padding_mask: Optional[Tensor] = None,
+                tgt_is_causal: Optional[bool] = False, memory_is_causal: Optional[bool] = False) -> Tensor:
         r"""Pass the inputs (and mask) through the decoder layer.
 
         Args:
@@ -92,11 +100,19 @@ class TransformerDecoderLayer(Module):
             memory_mask: the mask for the memory sequence (optional).
             tgt_key_padding_mask: the mask for the tgt keys per batch (optional).
             memory_key_padding_mask: the mask for the memory keys per batch (optional).
+            tgt_is_causal: if to apply causal mask to the target sequence (default False).
+            memory_is_causal: if to apply causal mask to the memory sequence (default False).
 
         Shape:
             see the docs in Transformer class.
         """
         # see Fig. 1 of https://arxiv.org/pdf/2002.04745v1.pdf
+
+        if tgt_is_causal and tgt_mask is None:
+            tgt_mask = generate_square_subsequent_mask(tgt.size(0)).to(tgt.device)
+
+        if memory_is_causal and memory_mask is None:
+            memory_mask = generate_square_subsequent_mask(memory.size(0)).to(memory.device)
 
         x = tgt
         if self.norm_first:
@@ -266,7 +282,8 @@ class TextTransformerDecoder(nn.Module):
                 memory_mask: Optional[Tensor] = None,
                 tgt_key_padding_mask: Optional[Tensor] = None,
                 memory_key_padding_mask: Optional[Tensor] = None,
-                return_before_output_proj: bool = False) -> Tensor:
+                return_before_output_proj: bool = False,
+                tgt_is_causal: Optional[bool] = False, memory_is_causal: Optional[bool] = False) -> Tensor:
         # tgt: (T, N, E)
         # memory: (S, N, E)
         # tgt_mask: (T, T)
@@ -299,4 +316,3 @@ class TextTransformerDecoder(nn.Module):
         for p in self.parameters():
             if p.dim() > 1:
                 xavier_uniform_(p)
-                
